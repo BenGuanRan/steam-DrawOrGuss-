@@ -61,7 +61,6 @@ const handelChange = (config) => {
 #draw_header {
   height: 50px;
   width: 100%;
-  background-color: #fff;
   .draw_tools {
     position: absolute;
     top: 0;

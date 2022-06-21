@@ -1,6 +1,12 @@
 <template>
   <div id="draw_timer">
-    <el-progress type="circle" :width="50" :stroke-width="3" :percentage="time" />
+    <el-progress
+      type="circle"
+      color="#000"
+      :width="50"
+      :stroke-width="3"
+      :percentage="time"
+    />
   </div>
 </template>
 
