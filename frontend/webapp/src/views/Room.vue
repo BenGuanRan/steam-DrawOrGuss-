@@ -6,11 +6,12 @@
     <div class="room_right">
       <UserList class="user_list"></UserList>
       <div class="room_right--footer">
-        <span>房间代码： BJMBDSMF《J》112</span><br />
-        <span>词库： 默认</span>
+        <span class="room_code">房间代码： BJMBDSMF112</span><br />
+        <span class="word_store">词库： 默认词库</span>
       </div>
     </div>
     <div class="goback" @click="goBack">返回</div>
+    <div class="start_game" @click="startGame">开始</div>
     <div class="game_rules" @click="showRules">游戏规则</div>
   </div>
 </template>
@@ -29,6 +30,9 @@ const goBack = () => {
 };
 // const num = ref(0);
 // const data = reactive({});
+const startGame = () => {
+  router.push("/drawboard");
+};
 </script>
 
 <style lang='scss' scoped>
@@ -69,11 +73,33 @@ const goBack = () => {
   .game_rules:hover {
     color: #000;
   }
+  .start_game {
+    font-size: 30px;
+    cursor: pointer;
+    position: absolute;
+    right: 350px;
+    bottom: 50px;
+    color: #3caa33;
+  }
+  .start_game:hover {
+    color: #3d853c;
+  }
   .room_right--footer {
     position: absolute;
     height: 100px;
     width: 100%;
     bottom: 0;
+  }
+  .room_code {
+    margin-left: 30px;
+    color: #878787;
+    font-size: 25px;
+    margin-bottom: 20px;
+  }
+  .word_store {
+    margin-left: 30px;
+    color: #565656;
+    font-size: 25px;
   }
 }
 </style>

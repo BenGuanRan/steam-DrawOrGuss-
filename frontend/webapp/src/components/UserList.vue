@@ -22,23 +22,23 @@ const userList = reactive([
     ifMaster: true,
   },
   {
-    username: "小明",
+    username: "BenGreen",
+    ifOver: true,
+    ifMaster: false,
+  },
+  {
+    username: "aran",
     ifOver: false,
     ifMaster: false,
   },
   {
-    username: "小明",
+    username: "阿然",
     ifOver: false,
     ifMaster: false,
   },
   {
-    username: "小明",
-    ifOver: false,
-    ifMaster: false,
-  },
-  {
-    username: "小明",
-    ifOver: false,
+    username: "我是时光鸡",
+    ifOver: true,
     ifMaster: false,
   },
 ]);
