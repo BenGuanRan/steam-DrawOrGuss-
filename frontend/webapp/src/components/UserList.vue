@@ -18,7 +18,7 @@ import User from "@/components/User";
 const userList = reactive([
   {
     username: "小明",
-    ifOver: false,
+    ifOver: true,
     ifMaster: true,
   },
   {

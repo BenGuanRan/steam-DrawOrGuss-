@@ -5,8 +5,8 @@
     </div>
     <div class="user_footer">
       {{ props.userInfo.username }}
-      <div v-show="props.userInfo.ifOver" class="ifover">√</div>
-      <div v-if="props.userInfo.ifMaster" class="master">🏠</div>
+      <div v-show="props.userInfo.ifOver" class="ifover"></div>
+      <div v-if="props.userInfo.ifMaster" class="master"></div>
     </div>
   </div>
 </template>
@@ -65,13 +65,18 @@ console.log(props.userInfo);
       position: absolute;
       width: 20px;
       height: 20px;
-      top: 0;
+      top: 5px;
     }
     .ifover {
-      color: #3caa33;
+      background-image: url(../assets/images/OK.png);
+      background-size: contain;
+      background-repeat: no-repeat;
     }
     .master {
       left: 30px;
+      background-image: url(../assets/images/king.png);
+      background-size: contain;
+      background-repeat: no-repeat;
     }
   }
 }

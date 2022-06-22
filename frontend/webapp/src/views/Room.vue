@@ -10,7 +10,7 @@
         <span class="word_store">词库： 默认词库</span>
       </div>
     </div>
-    <div class="goback" @click="goBack">返回</div>
+    <div class="goback" @click="goBack"></div>
     <div class="start_game" @click="startGame">开始</div>
     <div class="game_rules" @click="showRules">游戏规则</div>
   </div>
@@ -40,6 +40,11 @@ const startGame = () => {
   position: relative;
   height: 100%;
   width: 100%;
+  // transform: scale(-1);
+  background-image: url(../assets/images/room_background.png);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
   .room_left,
   .room_right {
     float: left;
@@ -47,13 +52,14 @@ const startGame = () => {
     width: 50%;
   }
   .room_right {
-    background-color: #eaeaea;
     overflow: auto;
     .user_list {
       margin-left: 40px;
     }
   }
   .goback {
+    background-image: url(../assets/images/back.png);
+    background-repeat: no-repeat;
     width: 50px;
     height: 50px;
     background-color: #ccc;

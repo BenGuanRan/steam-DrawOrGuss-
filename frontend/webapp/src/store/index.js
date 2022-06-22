@@ -6,7 +6,11 @@ export default createStore({
       color: '#000',
       width: 5
     },
-    canvasNode: document.querySelector('#user_canvas')
+    canvasNode: document.querySelector('#user_canvas'),
+    userStatus: {
+      username:'',
+      drawOrGuss:'',
+    }
   },
   mutations: {
     changeColor(state, newColor) {

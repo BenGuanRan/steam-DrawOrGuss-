@@ -40,7 +40,9 @@ onBeforeUnmount(() => {
   width: 100%;
   height: 100%;
   canvas {
-    background-color: #fdfef2;
+    position: absolute;
+    z-index: 2;
+    background-color: #fdfef200;
   }
 }
 </style>

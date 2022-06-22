@@ -59,6 +59,7 @@ const handelChange = (config) => {
 
 <style lang='scss' scoped>
 #draw_header {
+  margin-top: 10px;
   height: 50px;
   width: 100%;
   .draw_tools {
@@ -67,17 +68,20 @@ const handelChange = (config) => {
     left: 100px;
   }
   .draw_color--container {
+    z-index: 3;
     position: absolute;
     right: 80px;
     top: 5px;
   }
   .draw_timer {
+    z-index: 3;
     position: absolute;
     top: 0;
     left: 50%;
     transform: translateX(-50%);
   }
   .draw_point--contioner {
+    z-index: 3;
     display: flex;
     justify-content: space-between;
     align-items: center;
