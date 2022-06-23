@@ -2,6 +2,8 @@ import { createRouter, createWebHistory } from 'vue-router'
 import DrawBoard from '@/views/DrawBoard'
 import Home from '@/views/Home'
 import Room from '@/views/Room'
+import store from '@/store'
+
 const routes = [
   {
     path: '/',
@@ -24,6 +26,23 @@ const routes = [
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
   routes
+})
+
+
+router.beforeEach((to, from, next) => {
+  if (to.fullPath === '/room') {
+    if (!localStorage.getItem('dg-username')) {
+      next('/home')
+    } else {
+      store.state.userStatus.username = localStorage.getItem('dg-username')
+      next()
+    }
+
+  }
+  else {
+    next()
+  }
+
 })
 
 export default router

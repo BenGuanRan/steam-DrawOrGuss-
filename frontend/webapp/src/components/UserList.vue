@@ -11,37 +11,51 @@
 </template>
 
 <script setup>
-import { reactive } from "vue";
+import { onMounted, inject, reactive } from "vue";
 import User from "@/components/User";
+// import { useStore } from "vuex";
 
+const socket = inject("socket");
+const userList = reactive([]);
+// const {
+//   userList,
+//   userStatus: { username },
+// } = useStore().state;
+onMounted(() => {
+  console.log(sessionStorage.getItem("roomID"));
+  socket.on(sessionStorage.getItem("roomID") + "updateRoom", (res) => {
+    userList.push(...res);
+    console.log(res);
+  });
+});
 // const num = ref(0);
-const userList = reactive([
-  {
-    username: "小明",
-    ifOver: true,
-    ifMaster: true,
-  },
-  {
-    username: "BenGreen",
-    ifOver: true,
-    ifMaster: false,
-  },
-  {
-    username: "aran",
-    ifOver: false,
-    ifMaster: false,
-  },
-  {
-    username: "阿然",
-    ifOver: false,
-    ifMaster: false,
-  },
-  {
-    username: "我是时光鸡",
-    ifOver: true,
-    ifMaster: false,
-  },
-]);
+// const userList = reactive([
+// {
+//   username: "小明",
+//   ifOver: true,
+//   ifMaster: true,
+// },
+// {
+//   username: "BenGreen",
+//   ifOver: true,
+//   ifMaster: false,
+// },
+// {
+//   username: "aran",
+//   ifOver: false,
+//   ifMaster: false,
+// },
+// {
+//   username: "阿然",
+//   ifOver: false,
+//   ifMaster: false,
+// },
+// {
+//   username: "我是时光鸡",
+//   ifOver: true,
+//   ifMaster: false,
+// },
+// ]);
 </script>
 
 <style lang='scss' scoped>

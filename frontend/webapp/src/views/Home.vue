@@ -19,13 +19,31 @@
 
 <script setup>
 import { useRouter } from "vue-router";
-import { ref } from "vue";
+import { ref, inject } from "vue";
 
 const router = useRouter();
+const socket = inject("socket");
+
 const createRoom = () => {
-  router.push("/room");
+  // 用户身份(0普通用户，1房主)
+  window.sessionStorage.setItem("userStatus", 1);
+  const userId = window.sessionStorage.getItem("userID");
+  let username =
+    window.sessionStorage.getItem("username") || prompt("请输入昵称");
+  if (username) {
+    window.sessionStorage.setItem("username", username);
+    // 发送创建房间消息
+    socket.emit(userId + "createRoom", username);
+    // 监听创建房间消息
+    socket.on(userId + "createRoom", (res) => {
+      // 记录房间号
+      window.sessionStorage.setItem("roomID", res);
+      router.push("/room");
+    });
+  }
 };
 const joinRoom = () => {
+  window.sessionStorage.setItem("userStatus", 0);
   ifJoin.value = true;
 };
 
@@ -76,15 +94,17 @@ const doCancel = () => {
     position: relative;
     .input_bgc {
       left: 50%;
-      transform: translate(-50%, -10px);
+      transform: translate(-50%, -13px);
       position: absolute;
-      width: 340px;
+      width: 350px;
       height: 70px;
       background-image: url(../assets/images/input.png);
       background-repeat: no-repeat;
       background-size: cover;
     }
     .game_join--input {
+      position: relative;
+      z-index: 1;
       height: 50px;
       width: 300px;
       font-size: 25px;
@@ -92,6 +112,7 @@ const doCancel = () => {
       outline: none;
       border: none;
       color: #696b6f;
+      background-color: rgba(255, 255, 255, 0);
     }
     .game_join--title {
       width: 100%;

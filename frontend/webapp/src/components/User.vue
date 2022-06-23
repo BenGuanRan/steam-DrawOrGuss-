@@ -37,7 +37,6 @@ const props = defineProps({
   userInfo: Object,
   num: Number,
 });
-console.log(props.userInfo);
 // import { reactive, ref } from "vue";
 
 // const num = ref(0);
