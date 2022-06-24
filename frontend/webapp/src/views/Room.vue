@@ -14,7 +14,22 @@
     <div class="goback" v-if="userStatus == 0" @click="goBack"></div>
     <div class="end_game" v-if="userStatus == 1" @click="endGame">关闭</div>
     <div class="start_game" v-if="userStatus == 1" @click="startGame">开始</div>
-    <div class="start_game" v-if="userStatus == 0" @click="startGame">准备</div>
+    <div
+      class="prepare_game"
+      v-if="userStatus == 0"
+      v-show="!ifPrepared"
+      @click="prepareGame"
+    >
+      准备
+    </div>
+    <div
+      class="cancelprepare_game"
+      v-if="userStatus == 0"
+      @click="cancelPrepareGame"
+      v-show="ifPrepared"
+    >
+      取消准备
+    </div>
     <div class="game_rules" @click="showRules">游戏规则</div>
   </div>
 </template>
@@ -23,11 +38,11 @@
 import { useRouter } from "vue-router";
 import SetingsBoard from "@/components/SetingsBoard";
 import UserList from "@/components/UserList";
-import { inject } from "vue";
+import { inject, onMounted, ref } from "vue";
 
 const roomID = window.sessionStorage.getItem("roomID");
+const userID = window.sessionStorage.getItem("userID");
 const userStatus = window.sessionStorage.getItem("userStatus");
-console.log(userStatus);
 const router = useRouter();
 const socket = inject("socket");
 const showRules = () => {
@@ -36,18 +51,51 @@ const showRules = () => {
 const goBack = () => {
   window.sessionStorage.removeItem("userStatus");
   window.sessionStorage.removeItem("roomID");
+  window.sessionStorage.removeItem("roomInfo");
   // 删除房间
-  socket.emit;
+  socket.emit(userID + "exitRoom", { roomID, userID });
+  router.push("/home");
 };
-// const num = ref(0);
-// const data = reactive({});
 const startGame = () => {
   router.push("/drawboard");
 };
 // 关闭房间
 const endGame = () => {
+  window.sessionStorage.removeItem("userStatus");
+  window.sessionStorage.removeItem("roomID");
+  window.sessionStorage.removeItem("roomInfo");
   socket.emit(roomID + "closeRoom", roomID);
   router.push("/home");
+};
+
+// 房间关闭的回调
+onMounted(() => {
+  socket.on(roomID + "roomHasClosed", () => {
+    alert("该房间已被房主关闭！");
+    window.sessionStorage.removeItem("userStatus");
+    window.sessionStorage.removeItem("roomID");
+    window.sessionStorage.removeItem("roomInfo");
+    router.push("/home");
+  });
+});
+
+const ifPrepared = ref(false);
+onMounted(() => {
+  ifPrepared.value = window.sessionStorage.getItem("prepare") || false;
+});
+// 准备游戏
+const prepareGame = () => {
+  ifPrepared.value = true;
+  window.sessionStorage.setItem("prepared", "All ready prepared!");
+  // 准备游戏
+  socket.emit(userID + "prepare", { userID, roomID });
+};
+
+const cancelPrepareGame = () => {
+  ifPrepared.value = false;
+  window.sessionStorage.removeItem("prepared");
+  // 准备游戏
+  socket.emit(userID + "cancelPrepare", { userID, roomID });
 };
 </script>
 
@@ -95,7 +143,8 @@ const endGame = () => {
   .game_rules:hover {
     color: #000;
   }
-  .start_game {
+  .start_game,
+  .prepare_game {
     font-size: 30px;
     cursor: pointer;
     position: absolute;
@@ -103,10 +152,13 @@ const endGame = () => {
     bottom: 50px;
     color: #3caa33;
   }
-  .start_game:hover {
+
+  .start_game:hover,
+  .prepare_game:hover {
     color: #3d853c;
   }
-  .end_game {
+  .end_game,
+  .cancelprepare_game {
     font-size: 30px;
     cursor: pointer;
     position: absolute;
@@ -114,7 +166,11 @@ const endGame = () => {
     bottom: 50px;
     color: #dd233c;
   }
-  .end_game:hover {
+  .cancelprepare_game {
+    right: 350px;
+  }
+  .end_game:hover,
+  .cancelprepare_game:hover {
     color: #963d34;
   }
   .room_right--footer {

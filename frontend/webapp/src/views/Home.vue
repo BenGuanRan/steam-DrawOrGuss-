@@ -7,7 +7,12 @@
       <div class="game_join--inner">
         <h1 class="game_join--title">请输入房间代码</h1>
         <div class="input_bgc"></div>
-        <input class="game_join--input" type="text" />
+        <input
+          class="game_join--input"
+          v-model="roomNum"
+          required
+          type="text"
+        />
         <div class="game_join--buttons">
           <div class="ok" @click="doJoin"></div>
           <div class="cancel" @click="doCancel"></div>
@@ -38,10 +43,13 @@ const createRoom = () => {
     socket.on(userId + "createRoom", (res) => {
       // 记录房间号
       window.sessionStorage.setItem("roomID", res);
+      console.log(router);
       router.push("/room");
     });
   }
 };
+
+const roomNum = ref("");
 const joinRoom = () => {
   window.sessionStorage.setItem("userStatus", 0);
   ifJoin.value = true;
@@ -51,10 +59,28 @@ const ifJoin = ref(false);
 
 // 加入
 const doJoin = () => {
-  router.push("/room");
+  const userID = window.sessionStorage.getItem("userID");
+  if (!roomNum.value) return;
+  let username =
+    window.sessionStorage.getItem("username") || prompt("请输入昵称");
+  if (username) {
+    window.sessionStorage.setItem("username", username);
+    socket.emit(userID + "joinRoom", { roomID: roomNum.value, username });
+    // 成功加入房间的回调
+    socket.on(userID + "joinRoomSuccess", (res) => {
+      window.sessionStorage.setItem("roomID", res);
+      router.push("/room");
+    });
+    // 加入房间失败的回调
+    socket.on(userID + "joinRoomError", () => {
+      alert("未找到此房间");
+      router.push("/home");
+    });
+  }
 };
 // 取消加入
 const doCancel = () => {
+  roomNum.value = "";
   ifJoin.value = false;
 };
 </script>

@@ -11,21 +11,24 @@
 </template>
 
 <script setup>
-import { onMounted, inject, reactive } from "vue";
+import { onMounted, inject, ref } from "vue";
 import User from "@/components/User";
 // import { useStore } from "vuex";
 
 const socket = inject("socket");
-const userList = reactive([]);
+const userList = ref([]);
 // const {
 //   userList,
 //   userStatus: { username },
 // } = useStore().state;
 onMounted(() => {
-  console.log(sessionStorage.getItem("roomID"));
+  const room = window.sessionStorage.getItem("roomInfo");
+  console.log(room);
+
+  if (room) userList.value = JSON.parse(room);
   socket.on(sessionStorage.getItem("roomID") + "updateRoom", (res) => {
-    userList.push(...res);
-    console.log(res);
+    userList.value = res;
+    window.sessionStorage.setItem("roomInfo", JSON.stringify(res));
   });
 });
 // const num = ref(0);

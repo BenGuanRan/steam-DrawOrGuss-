@@ -31,10 +31,10 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
   if (to.fullPath === '/room') {
-    if (!localStorage.getItem('dg-username')) {
+    if (!sessionStorage.getItem('username')) {
       next('/home')
     } else {
-      store.state.userStatus.username = localStorage.getItem('dg-username')
+      store.state.userStatus.username = sessionStorage.getItem('username')
       next()
     }
 

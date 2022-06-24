@@ -3,20 +3,18 @@
     <div class="game_info--container"></div>
     <h1>游戏设置</h1>
     <div class="settings_item">
-      <!-- <h2>游戏词库</h2>
-      <el-select v-model="value" placeholder="Select" size="large">
-        <el-option />
-        <el-option />
-        <el-option />
-      </el-select> -->
+      <h2>游戏词库</h2>
+      <el-select v-model="keyword" placeholder="Select" size="large">
+        <el-option v-for="k in keys" :key="k" :value="k" />
+      </el-select>
     </div>
     <div class="settings_item">
       <h2>人数限制</h2>
-      <!-- <el-slider v-model="value" show-input /> -->
+      <el-slider v-model="settings.memberLimits" show-input />
     </div>
     <div class="settings_item">
       <h2>作画时间</h2>
-      <!-- <el-slider v-model="value" show-input /> -->
+      <el-slider v-model="settings.timeLimits" show-input />
     </div>
     <div class="btn_container">
       <div>保存修改</div>
@@ -26,8 +24,16 @@
 </template>
 
 <script setup>
-// import { reactive, ref } from "vue";
+import { reactive, ref } from "vue";
+import { getKeys } from "@/utils/getWords";
 
+const keys = ref(getKeys());
+const keyword = ref("default");
+const settings = reactive({
+  wordsSource: [],
+  memberLimits: 16,
+  timeLimits: 60,
+});
 // const num = ref(0);
 // const data = reactive({});
 </script>
