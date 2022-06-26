@@ -7,8 +7,7 @@ import { onMounted, inject } from "vue";
 const socket = inject("socket");
 onMounted(() => {
   socket.on("connection", (res) => {
-    if (!window.sessionStorage.getItem("userID"))
-      window.sessionStorage.setItem("userID", res);
+    window.sessionStorage.setItem("userID", res);
   });
 });
 </script>

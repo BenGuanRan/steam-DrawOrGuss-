@@ -1,4 +1,5 @@
-const { handelRooms } = require("./handleRooms");
+const { handleRooms } = require("./handleRooms");
+const { handleGames } = require("./handleGames");
 
 
 function startSocket(io) {
@@ -8,7 +9,8 @@ function startSocket(io) {
         // 用户上线逻辑
         console.log(socket.id + ' connected');
         io.emit('connection', socket.id)
-        handelRooms(rooms, socket, io)
+        handleRooms(rooms, socket, io)
+        handleGames(rooms, socket, io)
         // 检测用户断开
         socket.on('disconnect', function () {
             console.log(socket.id + ' disconnected');

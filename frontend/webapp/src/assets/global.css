@@ -1,4 +1,13 @@
+@font-face {
+    font-family: "hand-written";
+    src: url('./fonts/hand-written.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+
 * {
+    font-family: 'hand-written';
     margin: 0;
     padding: 0;
     -moz-user-select: none;
@@ -10,6 +19,10 @@
     -khtml-user-select: none;
     /*早期浏览器*/
     user-select: none;
+}
+
+h1, h2 {
+    font-weight: 500;
 }
 
 html, body, #app, #nav {

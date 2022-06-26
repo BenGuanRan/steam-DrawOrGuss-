@@ -1,4 +1,4 @@
-function handelRooms(rooms, socket, io) {
+function handleRooms(rooms, socket, io) {
     // 创建房间
     socket.on(socket.id + 'createRoom', (masterName) => {
         // 创建房间逻辑
@@ -14,12 +14,27 @@ function handelRooms(rooms, socket, io) {
             ifMaster: true,
         })
         rooms.set(roomID, {
-            masterName: socket, // 房主socket
+            master: socket, // 房主socket
             room, // 房间基本情况（包括房主）
             users: [socket], // 存放包括房主在内的用户socket对象
+            settings: {
+                memberLimits: 10,
+                timeLimits: 60,
+                wordsSource: '流行语'
+            }
         })
         // 返回前端房间信息
-        socket.emit(socket.id + 'createRoom', roomID); // 返回房间号
+        socket.emit(socket.id + 'createRoom', {
+            roomID, settings: {
+                memberLimits: 10,
+                timeLimits: 60,
+                wordsSource: '流行语'
+            }
+        }); // 返回房间号
+        io.emit(roomID + 'roomMemberHasChanged', {
+            memberNums: 1,
+            sumNums: 10
+        })
         socket.emit(roomID + 'updateRoom', room); // 更新房间状态
         console.log(rooms);
         // 关闭房间
@@ -34,7 +49,7 @@ function handelRooms(rooms, socket, io) {
     socket.on(socket.id + 'joinRoom', res => {
         // 根据房间号寻找相应房间
         const room = rooms.get(res.roomID)
-        if (!room) {
+        if (!room || room.room.length >= room.settings.memberLimits) {
             // 加入房间失败
             socket.emit(socket.id + 'joinRoomError')
         } else {
@@ -46,8 +61,12 @@ function handelRooms(rooms, socket, io) {
                 ifOver: false,
                 ifMaster: false,
             })
-            socket.emit(socket.id + 'joinRoomSuccess', res.roomID) // 房间加入成功回调
+            socket.emit(socket.id + 'joinRoomSuccess', { roomID: res.roomID, settings: room.settings }) // 房间加入成功回调
             io.emit(res.roomID + 'updateRoom', room.room);// 更新房间状态
+            io.emit(res.roomID + 'roomMemberHasChanged', {
+                memberNums: room.room.length,
+                sumNums: room.settings.memberLimits
+            })
             room.users.push(socket)
         }
         console.log(rooms);
@@ -63,6 +82,10 @@ function handelRooms(rooms, socket, io) {
         })
         console.log(rooms);
         io.emit(res.roomID + 'updateRoom', r.room);
+        io.emit(res.roomID + 'roomMemberHasChanged', {
+            memberNums: r.room.length,
+            sumNums: r.settings.memberLimits
+        })
     })
     // 准备
     socket.on(socket.id + 'prepare', (res) => {
@@ -82,6 +105,19 @@ function handelRooms(rooms, socket, io) {
         })
         io.emit(res.roomID + 'updateRoom', r.room)
     })
+    // 修改设置
+    socket.on(socket.id + 'saveSettings', (res) => {
+        const r = rooms.get(res.roomID)
+        if (res.userID === r.master.id) {
+            r.settings = res.settings
+            io.emit(res.roomID + "settingsHasChanged", r.settings)
+            io.emit(res.roomID + 'roomMemberHasChanged', {
+                memberNums: r.room.length,
+                sumNums: r.settings.memberLimits
+            })
+        }
+
+    })
 }
 
-module.exports = { handelRooms }
+module.exports = { handleRooms }

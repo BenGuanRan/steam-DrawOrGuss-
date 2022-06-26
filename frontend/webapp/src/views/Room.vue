@@ -6,9 +6,13 @@
     <div class="room_right">
       <UserList class="user_list"></UserList>
       <div class="room_right--footer">
-        <span class="room_code">房间代码： {{ roomID }}</span
-        ><br />
-        <span class="word_store">词库： 默认词库</span>
+        <div class="room_code">
+          房间代码： {{ roomID }}
+          <span class="copy" @click="handleCopy(roomID)"></span>
+        </div>
+        <div class="member_counter">
+          房间人数：{{ memberNums }}/{{ sumNums }}
+        </div>
       </div>
     </div>
     <div class="goback" v-if="userStatus == 0" @click="goBack"></div>
@@ -39,6 +43,9 @@ import { useRouter } from "vue-router";
 import SetingsBoard from "@/components/SetingsBoard";
 import UserList from "@/components/UserList";
 import { inject, onMounted, ref } from "vue";
+import { ElNotification } from "element-plus";
+import { handleCopy } from "../utils/copy";
+import { clearUnnecessarySession } from "../utils/clearUnnecessarySession";
 
 const roomID = window.sessionStorage.getItem("roomID");
 const userID = window.sessionStorage.getItem("userID");
@@ -49,9 +56,7 @@ const showRules = () => {
   alert("rules!");
 };
 const goBack = () => {
-  window.sessionStorage.removeItem("userStatus");
-  window.sessionStorage.removeItem("roomID");
-  window.sessionStorage.removeItem("roomInfo");
+  clearUnnecessarySession();
   // 删除房间
   socket.emit(userID + "exitRoom", { roomID, userID });
   router.push("/home");
@@ -61,9 +66,7 @@ const startGame = () => {
 };
 // 关闭房间
 const endGame = () => {
-  window.sessionStorage.removeItem("userStatus");
-  window.sessionStorage.removeItem("roomID");
-  window.sessionStorage.removeItem("roomInfo");
+  clearUnnecessarySession();
   socket.emit(roomID + "closeRoom", roomID);
   router.push("/home");
 };
@@ -71,15 +74,18 @@ const endGame = () => {
 // 房间关闭的回调
 onMounted(() => {
   socket.on(roomID + "roomHasClosed", () => {
-    alert("该房间已被房主关闭！");
-    window.sessionStorage.removeItem("userStatus");
-    window.sessionStorage.removeItem("roomID");
-    window.sessionStorage.removeItem("roomInfo");
+    ElNotification({
+      title: "警告",
+      message: "房主已关闭该房间！",
+      type: "warning",
+    });
+    clearUnnecessarySession();
     router.push("/home");
   });
 });
 
 const ifPrepared = ref(false);
+
 onMounted(() => {
   ifPrepared.value = window.sessionStorage.getItem("prepare") || false;
 });
@@ -97,6 +103,25 @@ const cancelPrepareGame = () => {
   // 准备游戏
   socket.emit(userID + "cancelPrepare", { userID, roomID });
 };
+
+// 监听房间人数变化
+const memberNums = ref(0);
+const sumNums = ref(0);
+onMounted(() => {
+  const peopleCounting = JSON.parse(
+    window.sessionStorage.getItem("peopleCounting")
+  ) || {
+    memberNums: NaN,
+    sumNums: NaN,
+  };
+  memberNums.value = peopleCounting.memberNums;
+  sumNums.value = peopleCounting.sumNums;
+  socket.on(roomID + "roomMemberHasChanged", (res) => {
+    memberNums.value = res.memberNums;
+    sumNums.value = res.sumNums;
+    window.sessionStorage.setItem("peopleCounting", JSON.stringify(res));
+  });
+});
 </script>
 
 <style lang='scss' scoped>
@@ -184,8 +209,22 @@ const cancelPrepareGame = () => {
     color: #878787;
     font-size: 25px;
     margin-bottom: 20px;
+    line-height: 30px;
+    .copy {
+      visibility: hidden;
+      display: inline-block;
+      width: 25px;
+      height: 25px;
+      cursor: pointer;
+      background-position: 0 0;
+      background-image: url(../assets/images/copy.png);
+      background-repeat: no-repeat;
+    }
   }
-  .word_store {
+  .room_code:hover .copy {
+    visibility: visible;
+  }
+  .member_counter {
     margin-left: 30px;
     color: #565656;
     font-size: 25px;

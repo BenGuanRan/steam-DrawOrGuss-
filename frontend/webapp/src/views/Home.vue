@@ -25,6 +25,7 @@
 <script setup>
 import { useRouter } from "vue-router";
 import { ref, inject } from "vue";
+import { ElNotification } from "element-plus";
 
 const router = useRouter();
 const socket = inject("socket");
@@ -35,15 +36,20 @@ const createRoom = () => {
   const userId = window.sessionStorage.getItem("userID");
   let username =
     window.sessionStorage.getItem("username") || prompt("请输入昵称");
+  
   if (username) {
     window.sessionStorage.setItem("username", username);
     // 发送创建房间消息
     socket.emit(userId + "createRoom", username);
+    console.log(username);
     // 监听创建房间消息
     socket.on(userId + "createRoom", (res) => {
       // 记录房间号
-      window.sessionStorage.setItem("roomID", res);
-      console.log(router);
+      window.sessionStorage.setItem("roomID", res.roomID);
+      window.sessionStorage.setItem(
+        "roomSettings",
+        JSON.stringify(res.settings)
+      );
       router.push("/room");
     });
   }
@@ -68,12 +74,20 @@ const doJoin = () => {
     socket.emit(userID + "joinRoom", { roomID: roomNum.value, username });
     // 成功加入房间的回调
     socket.on(userID + "joinRoomSuccess", (res) => {
-      window.sessionStorage.setItem("roomID", res);
+      window.sessionStorage.setItem("roomID", res.roomID);
+      window.sessionStorage.setItem(
+        "roomSettings",
+        JSON.stringify(res.settings)
+      );
       router.push("/room");
     });
     // 加入房间失败的回调
     socket.on(userID + "joinRoomError", () => {
-      alert("未找到此房间");
+      ElNotification({
+        title: "无法加入",
+        message: "未找到该房间或该房间人数已满!",
+        type: "error",
+      });
       router.push("/home");
     });
   }
