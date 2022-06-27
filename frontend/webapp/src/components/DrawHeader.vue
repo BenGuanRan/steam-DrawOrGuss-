@@ -2,7 +2,12 @@
   <div id="draw_header">
     <!-- 绘画工具 -->
     <DrawTools class="draw_tools" @hasChangeTools="handelChange"></DrawTools>
-    <DrawTimer class="draw_timer"></DrawTimer>
+    <DrawTimer
+      :startTime="60"
+      :sumTime="60"
+      @theCountdownEnds="handelTimeOver"
+      class="draw_timer"
+    ></DrawTimer>
     <div class="draw_point--contioner">
       <div class="pointbox" @click="changeWidth(3)">
         <div class="draw_point">
@@ -54,6 +59,10 @@ const changeWidth = (w) => {
 const handelChange = (config) => {
   nowColor.value = config.color;
   nowWidth.value = config.width;
+};
+// 时间结束的回调
+const handelTimeOver = () => {
+  sessionStorage.removeItem("time");
 };
 </script>
 

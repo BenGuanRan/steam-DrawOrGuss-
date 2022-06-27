@@ -36,12 +36,20 @@
     </div>
     <div class="game_rules" @click="showRules">游戏规则</div>
   </div>
+  <div class="game_countdown" v-if="ifShowTimerdown">
+    <DrawTimer
+      @theCountdownEnds="handelTimeOver"
+      :width="300"
+      class="draw_timer"
+    ></DrawTimer>
+  </div>
 </template>
 
 <script setup>
 import { useRouter } from "vue-router";
 import SetingsBoard from "@/components/SetingsBoard";
 import UserList from "@/components/UserList";
+import DrawTimer from "@/components/DrawTimer";
 import { inject, onMounted, ref } from "vue";
 import { ElNotification } from "element-plus";
 import { handleCopy } from "../utils/copy";
@@ -61,8 +69,29 @@ const goBack = () => {
   socket.emit(userID + "exitRoom", { roomID, userID });
   router.push("/home");
 };
-const startGame = () => {
+
+// 时间结束，开始游戏
+const ifShowTimerdown = ref(false);
+const handelTimeOver = () => {
   router.push("/drawboard");
+};
+const startGame = () => {
+  const roomID = sessionStorage.getItem("roomID");
+  socket.emit(userID + "startGame", { roomID, userID });
+  socket.on(roomID + "startGame", (res) => {
+    // 更新session防止用户篡改
+    sessionStorage.setItem("roomInfo", JSON.stringify(res.roomInfo));
+    sessionStorage.setItem("roomSettings", JSON.stringify(res.roomSettings));
+    ifShowTimerdown.value = true;
+  });
+  // 禁止开始游戏回调
+  socket.on(userID + "forbidStartGame", (msg) => {
+    ElNotification({
+      title: "焯！",
+      message: msg,
+      type: "error",
+    });
+  });
 };
 // 关闭房间
 const endGame = () => {
@@ -228,6 +257,19 @@ onMounted(() => {
     margin-left: 30px;
     color: #565656;
     font-size: 25px;
+  }
+}
+.game_countdown {
+  z-index: 5;
+  top: 0;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.728);
+  .draw_timer {
+    position: absolute;
+    left: 40%;
+    top: 30%;
   }
 }
 </style>

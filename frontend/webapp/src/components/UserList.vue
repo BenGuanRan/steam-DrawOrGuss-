@@ -23,7 +23,6 @@ const userList = ref([]);
 // } = useStore().state;
 onMounted(() => {
   const room = window.sessionStorage.getItem("roomInfo");
-  console.log(room);
 
   if (room) userList.value = JSON.parse(room);
   socket.on(sessionStorage.getItem("roomID") + "updateRoom", (res) => {
