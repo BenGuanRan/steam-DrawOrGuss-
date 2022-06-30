@@ -1,23 +1,51 @@
 <template>
   <div id="draw_footer">
-    <div class="draw_container" v-if="!drawOrGuss">
+    <div class="draw_container" v-if="props.gameStatus === 'DRAW'">
       <span class="draw_reminder">请作画:</span>
       <br />
-      <span class="draw_content">请客，斩首，留下当狗</span>
+      <span class="draw_content">{{ props.word }}</span>
     </div>
-    <div class="guss_container" v-else>
+    <div class="guss_container" v-if="props.gameStatus === 'GUSS'">
       <div class="input_bgc"></div>
-      <input placeholder="这是什么？" />
-      <span>``</span>
+      <input placeholder="这是什么？" v-model="gussWord" />
+      <span @click="submitGuss">``</span>
     </div>
   </div>
 </template>
 
 <script setup>
-import { useStore } from "vuex";
+import { defineProps, ref, inject, defineEmits } from "vue";
 
-const store = useStore();
-const { drawOrGuss } = store.state.userStatus;
+const emit = defineEmits(["gussOver"]);
+
+const socket = inject("socket");
+const props = defineProps({
+  word: {
+    type: String,
+  },
+  gameStatus: {
+    type: String,
+  },
+});
+
+const gussWord = ref("");
+
+const submitGuss = () => {
+  const userID = sessionStorage.getItem("userID");
+  const roomID = sessionStorage.getItem("roomID");
+  const gameStep = sessionStorage.getItem("gameStep");
+  const memberIndex = sessionStorage.getItem("memberIndex");
+  const username = sessionStorage.getItem("username");
+  socket.emit(userID + "submitWord", {
+    userID,
+    roomID,
+    gussWord: gussWord.value,
+    gameStep,
+    memberIndex,
+    username,
+  });
+  emit("gussOver");
+};
 </script>
 
 <style lang='scss' scoped>

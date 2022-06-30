@@ -76,13 +76,24 @@ const handelTimeOver = () => {
   router.push("/drawboard");
 };
 const startGame = () => {
-  const roomID = sessionStorage.getItem("roomID");
   socket.emit(userID + "startGame", { roomID, userID });
+};
+onMounted(() => {
   socket.on(roomID + "startGame", (res) => {
     // 更新session防止用户篡改
     sessionStorage.setItem("roomInfo", JSON.stringify(res.roomInfo));
     sessionStorage.setItem("roomSettings", JSON.stringify(res.roomSettings));
     ifShowTimerdown.value = true;
+    sessionStorage.setItem("gameStatus", "DRAW");
+    sessionStorage.setItem("actionStack", JSON.stringify(res.actionStack));
+    // 存放编号和当前游戏步骤
+    // 查找当前编号
+    let memberIndex = 0;
+    res.roomInfo.forEach((i, index) => {
+      if (i.userID === userID) memberIndex = index + 1;
+    });
+    sessionStorage.setItem("memberIndex", memberIndex);
+    sessionStorage.setItem("gameStep", 1);
   });
   // 禁止开始游戏回调
   socket.on(userID + "forbidStartGame", (msg) => {
@@ -92,7 +103,7 @@ const startGame = () => {
       type: "error",
     });
   });
-};
+});
 // 关闭房间
 const endGame = () => {
   clearUnnecessarySession();

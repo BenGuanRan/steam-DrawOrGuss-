@@ -18,7 +18,7 @@
       <el-slider
         :disabled="userStatus != 1"
         v-model="settings.memberLimits"
-        :min="4"
+        :min="2"
         :max="16"
         :step="1"
         show-stops

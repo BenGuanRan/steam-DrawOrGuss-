@@ -13,7 +13,8 @@ function startSocket(io) {
         handleGames(rooms, socket, io)
         // 检测用户断开
         socket.on('disconnect', function () {
-            console.log(socket.id + ' disconnected');
+            console.log(socket.id + 'disconnected');
+            socket.emit(socket.id + 'disconnected')
         });
 
     });

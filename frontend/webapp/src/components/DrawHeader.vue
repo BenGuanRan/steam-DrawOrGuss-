@@ -8,6 +8,7 @@
       @theCountdownEnds="handelTimeOver"
       class="draw_timer"
     ></DrawTimer>
+    <div class="draw_ok" @click="submitDraw"></div>
     <div class="draw_point--contioner">
       <div class="pointbox" @click="changeWidth(3)">
         <div class="draw_point">
@@ -37,10 +38,12 @@
 </template>
 
 <script setup>
-import { ref, watch } from "vue";
+import { ref, watch, inject, defineEmits } from "vue";
 import DrawTimer from "@/components/DrawTimer";
 import DrawTools from "@/components/DrawTools";
 import { useStore } from "vuex"; // 引入useStore 方法
+
+const socket = inject("socket");
 
 // 颜色改变
 const store = useStore(); // 该方法用于返回store 实例
@@ -63,6 +66,27 @@ const handelChange = (config) => {
 // 时间结束的回调
 const handelTimeOver = () => {
   sessionStorage.removeItem("time");
+  submitDraw();
+};
+// 提交作画
+const userID = sessionStorage.getItem("userID");
+const roomID = sessionStorage.getItem("roomID");
+const gameStep = sessionStorage.getItem("gameStep");
+const memberIndex = sessionStorage.getItem("memberIndex");
+const emit = defineEmits(["drawOver"]);
+const submitDraw = () => {
+  const canvasDOM = store.state.canvasNode;
+  const username = sessionStorage.getItem("username");
+  const base64 = canvasDOM.toDataURL();
+  socket.emit(userID + "submitDraw", {
+    userID,
+    roomID,
+    base64,
+    gameStep,
+    memberIndex,
+    username,
+  });
+  emit("drawOver");
 };
 </script>
 
@@ -88,6 +112,17 @@ const handelTimeOver = () => {
     top: 0;
     left: 50%;
     transform: translateX(-50%);
+  }
+  .draw_ok {
+    width: 50px;
+    height: 50px;
+    position: absolute;
+    z-index: 3;
+    left: 50%;
+    background-image: url(../assets/images/OK.png);
+    background-repeat: no-repeat;
+    transform: translateX(100%);
+    cursor: pointer;
   }
   .draw_point--contioner {
     z-index: 3;
