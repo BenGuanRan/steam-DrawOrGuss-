@@ -7,7 +7,7 @@ function handleGames(rooms, socket, io) {
         // 如果有权限则通过
         if (res.userID === r.master.id && r.room.length >= 2 && r.room.length <= r.settings.memberLimits && ifAllOver) {
             r.actionStack = []
-            const words = getWords('流行语', r.users.length)
+            const words = getWords(r.settings.wordsSource, r.users.length)
             r.users.forEach((i, index) => {
                 // 定义行为栈
                 r.actionStack.push([words[index]])
@@ -50,7 +50,6 @@ function handleGames(rooms, socket, io) {
             sumCounts,
             actionStack: r.actionStack
         })
-        console.log(res.memberIndex, res.gameStep, sumCounts);
         if (drawCounts == sumCounts) {
             if (Number(res.gameStep) < Number(sumCounts))
                 io.emit(res.roomID + 'turnToGuss', { actionStack: r.actionStack, sumCounts })

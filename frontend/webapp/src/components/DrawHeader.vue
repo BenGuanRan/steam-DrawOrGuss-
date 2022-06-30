@@ -3,8 +3,8 @@
     <!-- 绘画工具 -->
     <DrawTools class="draw_tools" @hasChangeTools="handelChange"></DrawTools>
     <DrawTimer
-      :startTime="60"
-      :sumTime="60"
+      :startTime="settingTime"
+      :sumTime="settingTime"
       @theCountdownEnds="handelTimeOver"
       class="draw_timer"
     ></DrawTimer>
@@ -38,7 +38,7 @@
 </template>
 
 <script setup>
-import { ref, watch, inject, defineEmits } from "vue";
+import { ref, watch, inject, defineEmits, onMounted } from "vue";
 import DrawTimer from "@/components/DrawTimer";
 import DrawTools from "@/components/DrawTools";
 import { useStore } from "vuex"; // 引入useStore 方法
@@ -65,7 +65,6 @@ const handelChange = (config) => {
 };
 // 时间结束的回调
 const handelTimeOver = () => {
-  sessionStorage.removeItem("time");
   submitDraw();
 };
 // 提交作画
@@ -75,6 +74,7 @@ const gameStep = sessionStorage.getItem("gameStep");
 const memberIndex = sessionStorage.getItem("memberIndex");
 const emit = defineEmits(["drawOver"]);
 const submitDraw = () => {
+  sessionStorage.removeItem("time");
   const canvasDOM = store.state.canvasNode;
   const username = sessionStorage.getItem("username");
   const base64 = canvasDOM.toDataURL();
@@ -88,6 +88,14 @@ const submitDraw = () => {
   });
   emit("drawOver");
 };
+
+// 获取初始时间
+const settingTime = ref(60);
+onMounted(() => {
+  const settings = JSON.parse(sessionStorage.getItem("roomSettings"));
+  settingTime.value = settings.timeLimits;
+  console.log(settingTime.value);
+});
 </script>
 
 <style lang='scss' scoped>

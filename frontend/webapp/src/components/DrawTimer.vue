@@ -5,7 +5,7 @@
       color="#000"
       :width="props.width"
       :stroke-width="3"
-      :percentage="(time / sumTime) * 100"
+      :percentage="(time / props.sumTime) * 100"
       >{{ time }}s</el-progress
     >
   </div>
@@ -34,9 +34,12 @@ const time = ref(0);
 const timer = ref(() => {});
 
 onMounted(() => {
-  sessionStorage.removeItem("time");
-  time.value = Number(sessionStorage.getItem("time") || props.startTime);
-  sessionStorage.setItem("time", time.value);
+  if (!sessionStorage.getItem("time")) {
+    sessionStorage.setItem("time", props.startTime);
+    time.value = Number(sessionStorage.getItem("time"));
+  } else {
+    time.value = Number(sessionStorage.getItem("time"));
+  }
   timer.value = window.setInterval(() => {
     time.value = Number(sessionStorage.getItem("time"));
     time.value--;
@@ -49,7 +52,7 @@ onMounted(() => {
   }, 1000);
 });
 onUnmounted(() => {
-  sessionStorage.setItem("time", time.value);
+  window.clearInterval(timer.value);
 });
 </script>
 

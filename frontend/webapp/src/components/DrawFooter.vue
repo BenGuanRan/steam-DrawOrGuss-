@@ -44,6 +44,7 @@ const submitGuss = () => {
     memberIndex,
     username,
   });
+  gussWord.value = "";
   emit("gussOver");
 };
 </script>
